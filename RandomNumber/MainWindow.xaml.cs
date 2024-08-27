@@ -22,6 +22,73 @@ namespace RandomNumber
         public MainWindow()
         {
             InitializeComponent();
+            SkipNum.IsEnabled = false;
+            TimesNum.IsEnabled = false;
+            TimesNum.Text = "1";
+        }
+
+        #region 勾选框事件
+        private void EnableSkipNum(object sender, RoutedEventArgs e)
+        {
+            SkipNum.IsEnabled = true;
+        }
+
+        private void DisableSkipNum(object sender, RoutedEventArgs e)
+        {
+            SkipNum.IsEnabled = false;
+        }
+
+        private void EnableRandCount(object sender, RoutedEventArgs e)
+        {
+            TimesNum.IsEnabled = true;
+        }
+
+        private void DisableRandCount(object sender, RoutedEventArgs e)
+        {
+            TimesNum.Text = "1";
+            TimesNum.IsEnabled = false;
+        }
+        #endregion
+
+        private void RandNum(object sender, RoutedEventArgs e)
+        {
+            if(MinNum.Text != "" && MaxNum.Text != "" && TimesNum.Text != "")
+            {
+                if(int.TryParse(MinNum.Text, out int smallNum) && int.TryParse(MaxNum.Text, out int largeNum) && int.TryParse(TimesNum.Text, out int times))
+                {
+                    if(smallNum <= 1000000 && largeNum <= 1000000 && times <= 100)
+                    {
+                        if (smallNum <= largeNum)
+                        {
+                            // 外边一圈全是校验，一环套一环，真的烦
+                            Random random = new Random();
+                            StringBuilder result = new StringBuilder();
+                            for (int i = 0; i < times; i++, result.Append("\n"))
+                            {
+                                result.Append(random.Next(smallNum, largeNum + 1));
+                            }
+                            string finalResult = result.ToString();
+                            MessageBox.Show(finalResult, "随机数结果", MessageBoxButton.OK, MessageBoxImage.Information);
+                        }
+                        else
+                        {
+                            MessageBox.Show("最大数值小于最小数值", "错误：数值大小错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("请确保输入的数字在1,000,000以内且抽取数量在100以内", "错误：数值输入过大", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("请确保输入的是整数", "错误：数值输入格式错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            else
+            {
+                MessageBox.Show("请输入数字范围", "错误：没有数值输入", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 }

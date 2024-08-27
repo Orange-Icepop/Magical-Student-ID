@@ -25,17 +25,25 @@
                 <StackPanel HorizontalAlignment="Center" Grid.Column="0">
                     <TextBlock HorizontalAlignment="Center">最小数字</TextBlock>
                     <TextBox Name="MinNum"/>
-                    <CheckBox HorizontalAlignment="Center" Margin="0,10,0,0">跳过数字</CheckBox>
+                    <CheckBox HorizontalAlignment="Center" 
+                              Margin="0,10,0,0"
+                              Checked="EnableSkipNum"
+                              Unchecked="DisableSkipNum">
+                        跳过数字</CheckBox>
                     <TextBox Name="SkipNum" Width="50"/>
                 </StackPanel>
                 <StackPanel HorizontalAlignment="Center" Grid.Column="1">
                     <TextBlock HorizontalAlignment="Center">最大数字</TextBlock>
                     <TextBox Name="MaxNum"/>
-                    <CheckBox HorizontalAlignment="Center" Margin="0,10,0,0">抽取数量</CheckBox>
+                    <CheckBox HorizontalAlignment="Center"
+                              Margin="0,10,0,0"
+                              Checked="EnableRandCount"
+                              Unchecked="DisableRandCount">
+                        抽取数量</CheckBox>
                     <TextBox Name="TimesNum" Width="50"/>
                 </StackPanel>
             </Grid>
-            <Button Width="100" Height="30" Name="Start">抽取</Button>
+            <Button Width="100" Height="30" Name="Start" Click="RandNum">抽取</Button>
         </DockPanel>
     </Grid>
 </Window>
