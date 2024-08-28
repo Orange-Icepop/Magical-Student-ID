@@ -50,13 +50,33 @@ namespace RandomNumber
         }
         #endregion
 
+        private List<int> SkipNumList = new List<int>();
+
+        private void SkipNumCheck()
+        {
+            var skipNums = SkipNum.Text.Split(',');
+            SkipNumList.Clear();
+            foreach (var item in skipNums)
+            {
+                item.Trim();
+                if(int.TryParse(item, out int num) && num >= 0 && num <= 1000000)
+                {
+                    SkipNumList.Add(num);
+                }
+                else
+                {
+                    MessageBox.Show("请输入正确的排除数字。\n排除数字规则：单个正整数，以半角逗号分割。", "错误：排除数字错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
         private void RandNum(object sender, RoutedEventArgs e)
         {
             if(MinNum.Text != "" && MaxNum.Text != "" && TimesNum.Text != "")
             {
                 if(int.TryParse(MinNum.Text, out int smallNum) && int.TryParse(MaxNum.Text, out int largeNum) && int.TryParse(TimesNum.Text, out int times))
                 {
-                    if(smallNum <= 1000000 && largeNum <= 1000000 && times <= 100)
+                    if(smallNum <= 1000000 && smallNum>= 0 && largeNum <= 1000000 && largeNum >= 0 && times <= 100 && times >= 0)
                     {
                         if (smallNum <= largeNum)
                         {
@@ -65,7 +85,15 @@ namespace RandomNumber
                             StringBuilder result = new StringBuilder();
                             for (int i = 0; i < times; i++, result.Append("\n"))
                             {
-                                result.Append(random.Next(smallNum, largeNum + 1));
+                                int middle = random.Next(smallNum, largeNum + 1);
+                                if (!SkipNumList.Contains(middle))
+                                {
+                                    result.Append(middle);
+                                }
+                                else
+                                {
+                                    i--;
+                                }
                             }
                             string finalResult = result.ToString();
                             MessageBox.Show(finalResult, "随机数结果", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -77,7 +105,7 @@ namespace RandomNumber
                     }
                     else
                     {
-                        MessageBox.Show("请确保输入的数字在1,000,000以内且抽取数量在100以内", "错误：数值输入过大", MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show("请确保输入的数字在0~1,000,000以内且抽取数量在0~100以内", "错误：数值输入过大", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
                 else
