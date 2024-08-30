@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -24,9 +26,7 @@ namespace RandomNumber
         public MainWindow()
         {
             InitializeComponent();
-            SkipNum.IsEnabled = false;
-            TimesNum.IsEnabled = false;
-            TimesNum.Text = "1";
+            this.Loaded += LoadConf;
         }
 
         #region 勾选框事件
@@ -74,16 +74,6 @@ namespace RandomNumber
 
         private void RandNum(object sender, RoutedEventArgs e)
         {
-            /*
-            if (MinNum.Text != "" && MaxNum.Text != "" && TimesNum.Text != "")
-            {
-                if (int.TryParse(MinNum.Text, out int smallNum) && int.TryParse(MaxNum.Text, out int largeNum) && int.TryParse(TimesNum.Text, out int times))
-                {
-                    if (smallNum <= 1000000 && smallNum >= 0 && largeNum <= 1000000 && largeNum >= 0 && times <= 100 && times >= 0)
-                    {
-                        if (smallNum <= largeNum)
-                        {
-            */
             if (Verify())
             {
                 Random random = new Random();
@@ -113,28 +103,6 @@ namespace RandomNumber
                 string finalResult = result.ToString();
                 MessageBox.Show(finalResult, "随机数结果", MessageBoxButton.OK, MessageBoxImage.Information);
             }
-            /*
-                        }
-                        else
-                        {
-                            MessageBox.Show("最大数值小于最小数值", "错误：数值大小错误", MessageBoxButton.OK, MessageBoxImage.Error);
-                        }
-                    }
-                    else
-                    {
-                        MessageBox.Show("请确保输入的数字在0~1,000,000以内且抽取数量在0~100以内", "错误：数值输入过大", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("请确保输入的是整数", "错误：数值输入格式错误", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }
-            else
-            {
-                MessageBox.Show("请输入数字范围", "错误：没有数值输入", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            */
         }
 
         private bool Verify()
@@ -171,18 +139,69 @@ namespace RandomNumber
         private int largeNum;
         private int times;
 
-        /*
         private void SaveConf(object sender, RoutedEventArgs e)
         {
-            var conf = new
+            if (Verify())
             {
-                MinNum = MinNum.Text,
-                MaxNum = MaxNum.Text,
-                EnableSkipNum = EnableSkip.IsChecked,
-                SkipNum = SkipNum.Text,
+                var conf = new
+                {
+                    MinNum = MinNum.Text,
+                    MaxNum = MaxNum.Text,
+                    EnableSkipNum = EnableSkip.IsChecked,
+                    SkipNum = SkipNum.Text,
+                    AvoidRepeat = AvoidRepeat.IsChecked,
+                    EnableTimes = EnableTimes.IsChecked,
+                    TimesNum = TimesNum.Text,
+                };
+                string configString = JsonConvert.SerializeObject(conf, Formatting.Indented);
+                File.WriteAllText("conf.json", configString);
+                MessageBox.Show("配置已保存", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
             }
-            File.WriteAllText("conf.json", "");
         }
-        */
+
+        private void LoadConf(object sender, EventArgs e)
+        {
+            if (File.Exists("conf.json"))
+            {
+                try
+                {
+                    var conf = JObject.Parse(File.ReadAllText("conf.json"));
+                    MinNum.Text = conf["MinNum"].ToString();
+                    MaxNum.Text = conf["MaxNum"].ToString();
+                    EnableSkip.IsChecked = bool.Parse(conf["EnableSkipNum"].ToString());
+                    SkipNum.IsEnabled = bool.Parse(conf["EnableSkipNum"].ToString());
+                    SkipNum.Text = conf["SkipNum"].ToString();
+                    AvoidRepeat.IsChecked = bool.Parse(conf["AvoidRepeat"].ToString());
+                    EnableTimes.IsChecked = bool.Parse(conf["EnableTimes"].ToString());
+                    TimesNum.IsEnabled = bool.Parse(conf["EnableTimes"].ToString());
+                    TimesNum.Text = conf["TimesNum"].ToString();
+                }
+                catch
+                {
+                    MessageBox.Show("配置文件损坏，将不载入配置文件", "配置文件错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MinNum.Text = "";
+                    MaxNum.Text = "";
+                    EnableSkip.IsChecked = false;
+                    SkipNum.IsEnabled = false;
+                    SkipNum.Text = "";
+                    AvoidRepeat.IsChecked = false;
+                    EnableTimes.IsChecked = false;
+                    TimesNum.IsEnabled = false;
+                    TimesNum.Text = "1";
+                }
+            }
+            else
+            {
+                MinNum.Text = "";
+                MaxNum.Text = "";
+                EnableSkip.IsChecked = false;
+                SkipNum.IsEnabled = false;
+                SkipNum.Text = "";
+                AvoidRepeat.IsChecked = false;
+                EnableTimes.IsChecked = false;
+                TimesNum.IsEnabled = false;
+                TimesNum.Text = "1";
+            }
+        }
     }
 }
