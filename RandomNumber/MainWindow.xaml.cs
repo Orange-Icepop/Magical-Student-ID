@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Windows;
+using Microsoft.Win32;
 
 namespace RandomNumber
 {
@@ -75,15 +76,15 @@ namespace RandomNumber
                 if (Verify())
                 {
                     var skipList = SkipNumCheck();
-                    List<string> resultList = new List<string>();
                     StringBuilder result = new StringBuilder();
-                    RandomService.StartRandom(smallNum, largeNum, skipList, (uint)times, AvoidRepeat.IsChecked == true).ForEach(x => resultList.Add(x.ToString() + "\n"));
-                    foreach (string item in resultList)
+                    var resultList = RandomService.StartRandom(smallNum, largeNum, skipList, (uint)times, AvoidRepeat.IsChecked == true);
+                    foreach (var num in resultList)
                     {
-                        result.Append(item);
+                        result.AppendLine(num.ToString());
                     }
                     string finalResult = result.ToString();
                     MessageBox.Show(finalResult, "随机数结果", MessageBoxButton.OK, MessageBoxImage.Information);
+                    AskForSavingFile(finalResult);
                 }
             }
             catch (Exception ex)
@@ -189,6 +190,22 @@ namespace RandomNumber
                 EnableTimes.IsChecked = false;
                 TimesNum.IsEnabled = false;
                 TimesNum.Text = "1";
+            }
+        }
+
+        private void AskForSavingFile(string result)
+        {
+            var askResult = MessageBox.Show("是否保存结果到文件？", "提示", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (askResult != MessageBoxResult.Yes) return;
+            var saveFileDialog = new SaveFileDialog
+            {
+                Filter = "文本文档 (*.txt)|*.txt",
+                Title = "保存随机数结果到文件"
+            };
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                File.WriteAllText(saveFileDialog.FileName, result);
+                MessageBox.Show("文件已保存", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
     }
