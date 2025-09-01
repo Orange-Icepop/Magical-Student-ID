@@ -1,20 +1,11 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RandomNumber.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace RandomNumber
 {
@@ -38,6 +29,7 @@ namespace RandomNumber
         private void DisableSkipNum(object sender, RoutedEventArgs e)
         {
             SkipNum.IsEnabled = false;
+            SkipNum.Text = string.Empty;
         }
 
         private void EnableRandCount(object sender, RoutedEventArgs e)
@@ -52,56 +44,52 @@ namespace RandomNumber
         }
         #endregion
 
-        private List<int> SkipNumList = new List<int>();
-
-        private void SkipNumCheck()
+        private List<int> SkipNumCheck()
         {
+            var ls = new List<int>();
+            if (EnableSkip.IsChecked == false || SkipNum.Text == "")
+            {
+                return ls;
+            }
             var skipNums = SkipNum.Text.Split(',');
-            SkipNumList.Clear();
             foreach (var item in skipNums)
             {
                 item.Trim();
                 if (int.TryParse(item, out int num) && num >= 0 && num <= 1000000)
                 {
-                    SkipNumList.Add(num);
+                    ls.Add(num);
                 }
                 else
                 {
                     MessageBox.Show("请输入正确的排除数字。\n排除数字规则：单个正整数，以半角逗号分割。", "错误：排除数字错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                    throw new Exception("Skip number format error");
                 }
             }
+            return ls;
         }
 
         private void RandNum(object sender, RoutedEventArgs e)
         {
-            if (Verify())
+            try
             {
-                Random random = new Random();
-                List<string> resultList = new List<string>();
-                StringBuilder result = new StringBuilder();
-                for (int i = 0; i < times; i++)
+                if (Verify())
                 {
-                    int middle = random.Next(smallNum, largeNum + 1);
-                    if (SkipNumList.Contains(middle))
+                    var skipList = SkipNumCheck();
+                    List<string> resultList = new List<string>();
+                    StringBuilder result = new StringBuilder();
+                    RandomService.StartRandom(smallNum, largeNum, skipList, (uint)times, AvoidRepeat.IsChecked == true).ForEach(x => resultList.Add(x.ToString() + "\n"));
+                    foreach (string item in resultList)
                     {
-                        i--;
+                        result.Append(item);
                     }
-                    else if (AvoidRepeat.IsChecked == true && resultList.Contains(middle.ToString()))
-                    {
-                        i--;
-                    }
-                    else
-                    {
-                        resultList.Add(middle.ToString());
-                        resultList.Add("\n");
-                    }
+                    string finalResult = result.ToString();
+                    MessageBox.Show(finalResult, "随机数结果", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
-                foreach (string item in resultList)
-                {
-                    result.Append(item);
-                }
-                string finalResult = result.ToString();
-                MessageBox.Show(finalResult, "随机数结果", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                // Skip number format error
+                MessageBox.Show("抽取失败", $"抽取因以下错误而中止：{ex.Message}", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
