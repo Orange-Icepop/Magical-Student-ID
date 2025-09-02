@@ -55,14 +55,14 @@ namespace RandomNumber
             var skipNums = SkipNum.Text.Split(',');
             foreach (var item in skipNums)
             {
-                item.Trim();
-                if (int.TryParse(item, out int num) && num >= 0 && num <= 1000000)
+                var i = item.Trim();
+                if (int.TryParse(i, out int num) && num >= 0 && num <= 1000000)
                 {
                     ls.Add(num);
                 }
                 else
                 {
-                    MessageBox.Show("请输入正确的排除数字。\n排除数字规则：单个正整数，以半角逗号分割。", "错误：排除数字错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"请输入正确的排除数字。{Environment.NewLine}排除数字规则：单个正整数，以半角逗号分割。", "错误：排除数字错误", MessageBoxButton.OK, MessageBoxImage.Error);
                     throw new Exception("Skip number format error");
                 }
             }
@@ -76,12 +76,9 @@ namespace RandomNumber
                 if (Verify())
                 {
                     var skipList = SkipNumCheck();
-                    StringBuilder result = new StringBuilder();
+                    StringBuilder result = new();
                     var resultList = RandomService.StartRandom(smallNum, largeNum, skipList, (uint)times, AvoidRepeat.IsChecked == true);
-                    foreach (var num in resultList)
-                    {
-                        result.AppendLine(num.ToString());
-                    }
+                    result.AppendJoin(Environment.NewLine, resultList);
                     string finalResult = result.ToString();
                     MessageBox.Show(finalResult, "随机数结果", MessageBoxButton.OK, MessageBoxImage.Information);
                     AskForSavingFile(finalResult);
@@ -167,7 +164,7 @@ namespace RandomNumber
                 }
                 catch
                 {
-                    MessageBox.Show("配置文件损坏，将不载入配置文件", "配置文件错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("无法正确读取配置文件，将不载入配置文件", "配置文件错误", MessageBoxButton.OK, MessageBoxImage.Error);
                     MinNum.Text = "";
                     MaxNum.Text = "";
                     EnableSkip.IsChecked = false;
@@ -193,7 +190,7 @@ namespace RandomNumber
             }
         }
 
-        private void AskForSavingFile(string result)
+        private static void AskForSavingFile(string result)
         {
             var askResult = MessageBox.Show("是否保存结果到文件？", "提示", MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (askResult != MessageBoxResult.Yes) return;

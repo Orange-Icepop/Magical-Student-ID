@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RandomNumber"
         mc:Ignorable="d"
-        Title="MainWindow" Height="300" Width="500">
+        Title="魔法学号" Height="300" Width="500">
     <Grid>
         <DockPanel Margin="10">
             <!--Title-->
@@ -15,7 +15,7 @@
                 魔法学号</TextBlock>
             <TextBlock DockPanel.Dock="Top">随机数生成器</TextBlock>
             <!--Foot-->
-            <TextBlock DockPanel.Dock="Bottom" HorizontalAlignment="Right" FontSize="10">OrangeIcepop制作</TextBlock>
+            <TextBlock DockPanel.Dock="Bottom" HorizontalAlignment="Right" FontSize="10">Orange-Icepop制作</TextBlock>
             <!--Main-->
             <Grid DockPanel.Dock="Top" Width="200">
                 <Grid.ColumnDefinitions>
